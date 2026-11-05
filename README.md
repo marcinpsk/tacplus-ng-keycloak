@@ -12,11 +12,17 @@ The header of each script lists its environment variables. `sample/` has example
 ```bash
 docker pull ghcr.io/marcinpsk/tacplus-ng-keycloak:latest
 docker run --cap-add=NET_BIND_SERVICE -p 49:49 \
+  -e KEYCLOAK_URL=https://keycloak.example.com \
+  -e REDIS_URL=redis://redis.example.com:6379/0 \
   -v /path/to/config:/etc/tac_plus-ng:ro \
   ghcr.io/marcinpsk/tacplus-ng-keycloak:latest
 ```
 
 The image reads `/etc/tac_plus-ng/tac_plus-ng.cfg`.
+
+Both backends need a Redis or Valkey server for authorization, and the image does not include one. A successful login stores the user's groups there. INFO and HOST requests have no password, so they read the groups from that server. Without it, these requests return `NFD` (not found), also after a successful login. `REDIS_URL` names the server. Its default is `redis://localhost:6379/0`.
+
+Give all variables with `-e` or an env file. One `setenv` in a `mavis module` block replaces the complete environment of the script, so the script does not get these variables. `sample/tac_plus-ng-keycloak-vault.cfg` explains this.
 
 ## Build
 

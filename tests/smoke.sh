@@ -39,6 +39,17 @@ output=$(printf "$request" | docker run --rm -i -e VAULT_ADDR=http://127.0.0.1:9
 check "vault backend answers" '^6 ERR$' "$output"
 check "vault backend ends its reply" '^=0$' "$output"
 
+# Without a cache, INFO has no groups to return: README.md documents this.
+info='0 TACPLUS\n4 alice\n49 INFO\n=\n'
+output=$(printf "$info" | docker run --rm -i -e KEYCLOAK_URL=http://127.0.0.1:9 \
+    --entrypoint /usr/local/lib/mavis/mavis_tacplus_keycloak.py "$image" 2>&1)
+check "keycloak INFO without a cache is not found" '^6 NFD$' "$output"
+
+output=$(printf "$info" | docker run --rm -i -e VAULT_ADDR=http://127.0.0.1:9 \
+    -e VAULT_ROLE_ID=role -e VAULT_SECRET_ID=secret \
+    --entrypoint /usr/local/lib/mavis/mavis_tacplus_vault.py "$image" 2>&1)
+check "vault INFO without a cache is not found" '^6 NFD$' "$output"
+
 # The licenses require that binary redistributions carry the notices.
 for notice in LICENSE LICENSE.upstream; do
     output=$(docker run --rm --entrypoint /bin/cat "$image" "/usr/share/doc/tacplus-ng-keycloak/$notice" 2>&1)
