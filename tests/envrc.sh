@@ -32,5 +32,15 @@ output=$(run_envrc "$minimum" no-venv)
 grep -q 'rc=0 venv=active' <<<"$output" || fail "uv $minimum: did not sync and activate" "$output"
 [ -x "$work/$minimum/project/.venv/bin/ruff" ] || fail "uv $minimum: dependencies are missing" "$output"
 
+# The commands in CLAUDE.md and the script headers must work in this environment.
+python=$work/$minimum/project/.venv/bin/python
+request='0 TACPLUS\n4 user\n8 pass\n49 AUTH\n=\n'
+output=$(printf "$request" | PYTHONPATH=$repo/upstream/mavis/python KEYCLOAK_URL=http://127.0.0.1:9 \
+    "$python" "$repo/mavis/mavis_tacplus_keycloak.py" 2>&1)
+grep -q '^6 ERR$' <<<"$output" || fail "keycloak script does not run in the environment" "$output"
+output=$(printf "$request" | PYTHONPATH=$repo/upstream/mavis/python VAULT_ADDR=http://127.0.0.1:9 \
+    VAULT_ROLE_ID=role VAULT_SECRET_ID=secret "$python" "$repo/mavis/mavis_tacplus_vault.py" 2>&1)
+grep -q '^6 ERR$' <<<"$output" || fail "vault script does not run in the environment" "$output"
+
 [ "$failed" = 0 ] && echo "ok: .envrc requires uv $minimum"
 exit "$failed"
