@@ -1,12 +1,9 @@
-.git
-build
+**/.git
 **/*.o
 **/*.so
 **/*~
 **/*.bak
-*.md
+upstream/build
 .github/
-LICENSE
-CONTRIBUTING
-README
-PREREQUISITES.txt
+.venv
+tests/

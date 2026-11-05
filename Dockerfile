@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /src
+COPY upstream /src
 WORKDIR /src
 
 ENV CC=clang
@@ -36,8 +36,12 @@ COPY --from=builder /staging/usr/local/sbin/tac_plus-ng /usr/local/sbin/tac_plus
 COPY --from=builder /staging/usr/local/lib/ /usr/local/lib/
 
 # Add the Keycloak and Vault MAVIS scripts (not in upstream install targets)
-COPY mavis/python/mavis_tacplus_keycloak.py /usr/local/lib/mavis/mavis_tacplus_keycloak.py
-COPY mavis/python/mavis_tacplus_vault.py /usr/local/lib/mavis/mavis_tacplus_vault.py
+COPY mavis/mavis_tacplus_keycloak.py /usr/local/lib/mavis/mavis_tacplus_keycloak.py
+COPY mavis/mavis_tacplus_vault.py /usr/local/lib/mavis/mavis_tacplus_vault.py
+
+# Binary redistributions must carry these notices
+COPY LICENSE /usr/share/doc/tacplus-ng-keycloak/LICENSE
+COPY upstream/LICENSE /usr/share/doc/tacplus-ng-keycloak/LICENSE.upstream
 
 # Ensure the dynamic linker can find libmavis.so
 RUN ldconfig
