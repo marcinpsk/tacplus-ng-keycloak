@@ -21,8 +21,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - language: c-cpp
-            build-mode: manual
           - language: python
             build-mode: none
 
@@ -30,25 +28,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install build dependencies
-        if: matrix.language == 'c-cpp'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            clang make perl \
-            libpcre2-dev libc-ares-dev libssl-dev
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4.39.1
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-
-      - name: Build
-        if: matrix.language == 'c-cpp'
-        run: |
-          ./configure
-          make
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v4.39.1

@@ -1,0 +1,6 @@
+.env
+.handoff/
+.python-version
+.ruff_cache
+.venv
+__pycache__

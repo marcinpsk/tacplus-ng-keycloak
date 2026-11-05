@@ -24,7 +24,7 @@ Test input for authentication:
 printf "0 TACPLUS\\n4 admin\\n8 s3cret\\n49 AUTH\\n=\\n" | \\
   VAULT_ADDR=http://127.0.0.1:8200 \\
   VAULT_ROLE_ID=<role-id> VAULT_SECRET_ID=<secret-id> \\
-  PYTHONPATH=mavis/python python3 mavis/python/mavis_tacplus_vault.py
+  PYTHONPATH=upstream/mavis/python python3 mavis/mavis_tacplus_vault.py
 
 #######
 
@@ -131,14 +131,10 @@ VAULT_PATH_PREFIX = env("VAULT_PATH_PREFIX", "tacacs/users").strip("/")
 VAULT_VERIFY_TLS = env("VAULT_VERIFY_TLS", "1") != "0"
 VAULT_TIMEOUT = env_int("VAULT_TIMEOUT", 5)
 if VAULT_TIMEOUT <= 0:
-	raise RuntimeError(
-		"Invalid VAULT_TIMEOUT value: must be a positive integer"
-	)
+	raise RuntimeError("Invalid VAULT_TIMEOUT value: must be a positive integer")
 VAULT_CACHE_TTL = env_int("VAULT_CACHE_TTL", 300)
 if VAULT_CACHE_TTL <= 0:
-	raise RuntimeError(
-		"Invalid VAULT_CACHE_TTL value: must be a positive integer"
-	)
+	raise RuntimeError("Invalid VAULT_CACHE_TTL value: must be a positive integer")
 
 REDIS_URL = env("REDIS_URL", "redis://localhost:6379/0")
 VAULT_REDIS_CACHE_TTL = env_int("VAULT_REDIS_CACHE_TTL", 600)
@@ -202,15 +198,20 @@ def _vault_login():
 		return False
 	if resp.status_code != 200:
 		print(
-			"mavis_tacplus_vault: Vault login HTTP " + str(resp.status_code)
-			+ ": " + resp.text[:200],
+			"mavis_tacplus_vault: Vault login HTTP "
+			+ str(resp.status_code)
+			+ ": "
+			+ resp.text[:200],
 			file=sys.stderr,
 		)
 		return False
 	try:
 		auth = resp.json().get("auth", {})
 	except (json.JSONDecodeError, ValueError):
-		print("mavis_tacplus_vault: Vault login returned non-JSON response", file=sys.stderr)
+		print(
+			"mavis_tacplus_vault: Vault login returned non-JSON response",
+			file=sys.stderr,
+		)
 		return False
 	_vault_token = auth.get("client_token")
 	lease_duration = auth.get("lease_duration", 0)
@@ -223,7 +224,10 @@ def _vault_login():
 	if _vault_token:
 		print("mavis_tacplus_vault: Vault login successful", file=sys.stderr)
 		return True
-	print("mavis_tacplus_vault: Vault login response missing client_token", file=sys.stderr)
+	print(
+		"mavis_tacplus_vault: Vault login response missing client_token",
+		file=sys.stderr,
+	)
 	return False
 
 
@@ -337,9 +341,13 @@ def _vault_read_user(username):
 			if resp.status_code == 404:
 				return None, None
 			if resp.status_code in (401, 403):
-				raise RuntimeError("Vault auth failed after re-login: HTTP " + str(resp.status_code))
+				raise RuntimeError(
+					"Vault auth failed after re-login: HTTP " + str(resp.status_code)
+				)
 		else:
-			raise RuntimeError("Vault re-login failed after HTTP " + str(resp.status_code))
+			raise RuntimeError(
+				"Vault re-login failed after HTTP " + str(resp.status_code)
+			)
 
 	if resp.status_code != 200:
 		raise RuntimeError("Vault read error: HTTP " + str(resp.status_code))
@@ -352,8 +360,12 @@ def _vault_read_user(username):
 	password = data.get("password")
 	if password is None:
 		print(
-			"mavis_tacplus_vault: secret for user '" + username
-			+ "' at " + VAULT_PATH_PREFIX + "/" + username
+			"mavis_tacplus_vault: secret for user '"
+			+ username
+			+ "' at "
+			+ VAULT_PATH_PREFIX
+			+ "/"
+			+ username
 			+ " has no 'password' key; treating as not found",
 			file=sys.stderr,
 		)

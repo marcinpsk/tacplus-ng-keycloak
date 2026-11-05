@@ -17,3 +17,11 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+  - package-ecosystem: "gitsubmodule" # Bumps upstream, CI then builds and smoke tests it
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "weekly"

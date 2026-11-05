@@ -1,5 +1,5 @@
-# Only lint/format our own Python files, not upstream
-include = ["mavis/python/mavis_tacplus_keycloak.py"]
+# The upstream submodule is not ours to lint
+include = ["mavis/*.py"]
 
 [lint]
 select = ["E", "F", "W", "I", "B", "UP"]

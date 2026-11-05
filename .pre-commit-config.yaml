@@ -4,24 +4,25 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^mavis/python/mavis_tacplus_keycloak\.py$
+        files: ^mavis/.*\.py$
       - id: ruff-format
-        files: ^mavis/python/mavis_tacplus_keycloak\.py$
+        files: ^mavis/.*\.py$
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.47.0
     hooks:
       - id: markdownlint
         args: [--fix]
-        files: ^CLAUDE\.md$
+        files: ^(README|CLAUDE)\.md$
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        files: ^(mavis/python/mavis_tacplus_keycloak\.py|CLAUDE\.md|Dockerfile|\.github/.*)$
+        files: ^(mavis/.*\.py|tests/.*|README\.md|CLAUDE\.md|Dockerfile|\.github/.*)$
       - id: end-of-file-fixer
-        files: ^(mavis/python/mavis_tacplus_keycloak\.py|CLAUDE\.md|Dockerfile|\.github/.*)$
+        files: ^(mavis/.*\.py|tests/.*|README\.md|CLAUDE\.md|Dockerfile|\.github/.*)$
+      - id: check-shebang-scripts-are-executable
       - id: check-yaml
       - id: check-added-large-files
         args: [--maxkb=500]
